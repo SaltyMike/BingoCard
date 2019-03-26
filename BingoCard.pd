@@ -1,0 +1,163 @@
+import java.util.Scanner;
+import java.io.*;
+import java.io.FileNotFoundException;
+import java.util.Collections;
+import java.util.StringTokenizer;
+PImage img;
+
+float boardLength;
+float boardHeight;
+float sqrLength;
+ArrayList<String> list = new ArrayList<String>();
+ArrayList<Cell> cells = new ArrayList<Cell>();
+
+void setup(){
+  size(800,800);
+  boardLength = width;
+  boardHeight = height;
+  sqrLength = width/5;
+  int counter = 0;
+  img = loadImage("hellraiser.jpg");
+  
+  Scanner scanner = null;
+  try {
+    scanner = new Scanner(new File("File Location of HorrorBingo.txt"));
+} catch (FileNotFoundException ex) {
+    ex.printStackTrace();
+}
+  
+  while(scanner.hasNextLine()){
+    list.add(scanner.nextLine().toUpperCase());
+  }
+  
+  scanner.close();
+  
+  Collections.shuffle(list);
+
+  list.add(12,"JUMP SCARE");
+  
+  
+  for(int i = 0;i < 5;i++){
+    for(int j = 0; j < 5;j++){
+        Cell cell = new Cell(j * sqrLength,i * sqrLength,list.get(counter), false);
+        cells.add(cell);
+        counter++;
+    }
+  }
+}
+
+void draw(){
+  for(int i = 0;i < cells.size();i++){
+    if(!cells.get(i).checked){
+      fill(100);
+      strokeWeight(3);
+      square(cells.get(i).x,cells.get(i).y,sqrLength);
+      PFont f = createFont("Arial", 7);
+      fill(255);
+      fittedText(cells.get(i).text, f, cells.get(i).x + sqrLength/2, cells.get(i).y + sqrLength/2, sqrLength, sqrLength);
+    }
+    else{
+      fill(175);
+      square(cells.get(i).x,cells.get(i).y,sqrLength);
+      PFont f = createFont("Arial", 7);
+      strokeWeight(3);
+      fill(255);
+      fittedText(cells.get(i).text, f, cells.get(i).x + sqrLength/2, cells.get(i).y + sqrLength/2, sqrLength, sqrLength);
+    } 
+  }
+  push();
+  tint(255,50);
+  image(img,0,0);
+  pop();
+  //exit();
+  //noLoop();
+}
+
+
+void mousePressed(){
+ float xCoord = mouseX;
+ float yCoord = mouseY;
+ 
+ for(int i = 0;i < cells.size();i++){
+   if(xCoord <= cells.get(i).x + sqrLength && yCoord <= cells.get(i).y + sqrLength){
+     if(cells.get(i).checked == false){
+       cells.get(i).checked = true;
+       break;
+     }
+     else{
+       cells.get(i).checked = false;
+       break;
+     }
+   }
+ }
+}
+
+public void fittedText(String text, PFont font, 
+    float posX, float posY, 
+    float fitX, float fitY)
+{
+  String[] arr = text.split(" ");
+  String first = "";
+  String second = "";
+  int txtSizeFirst = 35;
+  int txtSizeSecond = 35;
+  int txtSize;
+  
+  if(arr.length >= 2){
+    for(int i = 0;i < floor(arr.length/2);i++){
+      if(i + 1 == arr.length){
+        first += arr[i];
+      }
+      else{
+        first += arr[i] + " ";
+      }
+    }
+    for(int j = ceil(arr.length/2);j < arr.length;j++){
+      if(j + 1 == arr.length){
+        second += arr[j];
+      }
+      else{
+        second += arr[j] + " ";
+      }
+    }
+   
+   textSize(35);
+   
+   while(textWidth(second) >= sqrLength - 10){ 
+     txtSizeSecond -= 1;
+     textSize(txtSizeSecond);
+   }
+   textSize(35);
+   txtSize = min(txtSizeFirst,txtSizeSecond);
+   while(textWidth(first) >= sqrLength - 10){ 
+     txtSizeFirst -= 1;
+     textSize(txtSizeFirst);
+   }
+   
+  txtSize = min(txtSizeFirst,txtSizeSecond);
+     
+  textAlign(CENTER,BOTTOM);
+  textFont(font);
+  textSize(txtSize);
+  //textSize(min(font.getSize()*fitX/textWidth(text), fitY));
+  text(first, posX, posY);
+  
+  textAlign(CENTER,TOP);
+  textFont(font);
+  textSize(txtSize);
+  //textSize(min(font.getSize()*fitX/textWidth(text), fitY));
+  text(second, posX, posY);
+  }
+  
+  else{
+    textAlign(CENTER,CENTER);
+    textFont(font);
+    textSize(txtSizeFirst);
+    //textSize(min(font.getSize()*fitX/textWidth(text), fitY));
+    text(text, posX, posY);
+  }
+}
+  void keyPressed(){
+   save("HorrorBingoCard.png");
+   println("saved");
+  }
