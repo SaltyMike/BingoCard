@@ -1,0 +1,14 @@
+class Cell{
+  
+  float x;
+  float y;
+  String text;
+  boolean checked;
+  
+  Cell(float x, float y, String text, boolean checked){
+     this.x = x;
+     this.y = y;
+     this.text = text;
+     this.checked = checked;
+  }
+}
